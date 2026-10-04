@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Marginalia: a reading journal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Caveat:wght@500;600&display=swap">
+<style>
+:root{box-sizing:border-box;color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--desk:#d6c8ae;--leather:#5e3a22;--paper:#f3e9d6;--ink:#2b2118;--pen:#1f3558;--red:#8a2b2b;--rule:rgba(90,65,40,.28)}
+html,body{height:100%;margin:0;background:var(--desk);overflow:hidden}
+*,*:before,*:after{box-sizing:inherit}
+body{font:17px/1.45 "IM Fell English",Georgia,serif;color:var(--ink);-webkit-user-select:none;user-select:none}
+#app{height:100%;display:flex;flex-direction:column;padding:10px}
+#stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+.leather{background:radial-gradient(ellipse at 30% 20%,rgba(255,255,255,.12),transparent 60%),repeating-linear-gradient(45deg,rgba(0,0,0,.05) 0 2px,transparent 2px 5px),var(--leather);border-radius:12px;box-shadow:0 14px 30px rgba(40,25,10,.45),inset 0 0 0 2px rgba(0,0,0,.25)}
+#cover{width:min(100%,520px);height:100%;max-height:720px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#e6c98f;cursor:pointer;position:relative;border:0;font:inherit}
+#cover:before{content:"";position:absolute;inset:16px;border:2px dashed rgba(230,201,143,.55);border-radius:8px}
+#cover h1{font-size:clamp(38px,9vw,64px);margin:0;font-weight:400;letter-spacing:2px;text-shadow:0 -1px 0 rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.15)}
+#cover p{font-style:italic;margin:10px 0 0;opacity:.85}
+#frame{padding:14px;width:min(100%,1180px);height:100%;max-height:820px;position:relative}
+#frame:before{content:"";position:absolute;inset:5px;border:1.5px dashed rgba(230,201,143,.4);border-radius:9px;pointer-events:none}
+#book{position:relative;width:100%;height:100%;display:flex;perspective:2400px;overflow:hidden;border-radius:4px;background:var(--paper)}
+.slot{flex:1;min-width:0;height:100%;position:relative}
+.page{position:absolute;inset:0;background:var(--paper);overflow:hidden}
+.page .in{position:absolute;inset:0 0 26px;overflow-y:auto;padding:22px 26px 10px;-webkit-overflow-scrolling:touch}
+.slot.L .page{background:linear-gradient(90deg,#f3e9d6 92%,#d9cbb0)}
+.slot.R .page{background:linear-gradient(270deg,#f3e9d6 92%,#d9cbb0)}
+.fold{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:14px;color:#8a7762}
+#leaf{position:absolute;top:0;height:100%;transform-style:preserve-3d;transform-origin:left center;z-index:5}
+#leaf .f{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+#leaf .b{transform:rotateY(180deg)}
+h2{font-weight:400;font-size:24px;margin:0 0 4px;color:var(--red);font-style:italic}
+h3{font-weight:400;font-size:19px;margin:18px 0 2px;border-bottom:1px solid var(--rule);color:var(--red);font-style:italic}
+.sub,.tiny{color:#7d6a56;font-size:15px;font-style:italic;margin:0 0 8px}
+label{display:block;margin:12px 0 0;font-size:16px}
+input,textarea,select,.hw{font:500 21px/28px Caveat,"Segoe Script",cursive;color:var(--pen)}
+input,select{width:100%;background:none;border:0;border-bottom:1px solid var(--rule);padding:2px 0;border-radius:0}
+textarea{width:100%;min-height:56px;background:repeating-linear-gradient(transparent 0 27px,var(--rule) 27px 28px);border:0;resize:none;padding:0;field-sizing:content}
+button{font:inherit;color:inherit;background:none;border:1px solid var(--rule);border-radius:4px;padding:5px 12px;cursor:pointer;background:rgba(255,255,255,.35)}
+button.on{background:var(--red);border-color:var(--red);color:#fff}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.row{display:flex;gap:8px;align-items:center}.row>span{flex:1}
+.dots button{border:0;background:none;padding:0 3px;font-size:24px;color:var(--red);line-height:1}
+.opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.item{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dotted var(--rule);cursor:pointer}
+.item small{color:#7d6a56}
+.note{border-left:3px solid var(--red);padding:2px 10px;margin:6px 0}
+.note button{border:0;background:none;padding:0 4px}
+.coll{position:absolute;inset:66px 12px 12px;border:1.5px dashed var(--rule);border-radius:6px;overflow:hidden}
+.ph{position:absolute;width:40%;background:#fffaf0;padding:6px 6px 16px;box-shadow:0 3px 8px rgba(40,25,10,.4);touch-action:none;cursor:grab}
+.ph:before{content:"";position:absolute;top:-9px;left:34%;width:32%;height:18px;background:rgba(200,170,110,.55);transform:rotate(-3deg)}
+.ph img{display:block;width:100%;pointer-events:none}
+.ph button{position:absolute;top:-8px;right:-8px;border-radius:50%;width:26px;height:26px;padding:0;line-height:1;background:#fffaf0}
+#bar{display:flex;justify-content:center;gap:8px;padding-top:10px;flex-wrap:wrap;align-items:center}
+#bar button{background:var(--leather);color:#e6c98f;border:0;padding:8px 16px;box-shadow:0 2px 0 rgba(0,0,0,.3)}
+#bar span{min-width:70px;text-align:center;color:#5c4a38}
+#panel{position:fixed;inset:0;background:rgba(30,20,10,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
+#panel>div{background:var(--paper);padding:20px;border-radius:8px;width:min(100%,460px)}
+</style></head><body><div id="app"></div>
+<script>
+var SEC=[
+["The story",[["t","I came for"],["t","I stayed because"],["t","I almost left when"],["t","And then it got me with"],["t","What I actually remember"],["t","The character who owns this story"],["t","What I wish the author had done differently"],["t","This story, without naming its genre"]]],
+["Characters",[["t","The ones who stayed"],["t","Character I wanted to shake"],["t","Character I unexpectedly loved"],["t","Character who deserved better"],["t","Character I would defend in court despite the evidence"]]],
+["The romance",[["d","Chemistry"],["d","Tension"],["d","Emotional payoff"],["d","Slow burn"],["t","My favourite thing about them"],["t","The moment they finally"],["c","Would I ship them?",["Yes","Obviously","Against my better judgement","No, but I understand the author"]],["t","Their relationship in one sentence"]]],
+["World and plot",[["t","Setting, system and lore"],["t","Things I understood / did not understand"],["t","Initial hook"],["t","Best arc"],["t","Weakest arc"],["t","Twist I did not see coming"],["t","Twist visible from orbit"]]],
+["Art",[["d","Overall"],["d","Character design"],["d","Expressions"],["d","Clothing"],["d","Backgrounds"],["d","Colour palette"],["t","What this series looks like in my head"]]],
+["The aftermath",[["t","Immediate feeling when I closed the last episode"],["t","Did it stay with me?"],["c","Would I reread it?",["Absolutely","Eventually","Certain arcs only","Probably not"]],["c","Would I recommend it?",["Yes","Depends on the person","No"]],["t","What I will remember (not the plot, not the names)"]]],
+["The receipts",[["t","Favourite quotes (short)"],["t","Episodes worth revisiting"]]],
+["Verdict",[["d","Plot"],["d","Characters"],["d","Romance"],["d","Worldbuilding"],["d","Art"],["d","Pacing"],["t","Worth the binge?"],["t","Who I would give it to / who should stay away"],["t","One-line verdict"]]]];
+var FAV=["Stories I would erase my memory to read again","Stories that emotionally ruined me","Best romance","Best worldbuilding","Best protagonist","Best side character","Funniest","Most unhinged","Most beautiful","Unexpected favourite","I don't know why I liked this but I did"];
+var DNF=["Art","Plot","Characters","Romance","Pacing","Lost interest","Absolutely not"];
+var DNA=[["likes","Apparently I like"],["dislikes","Apparently I don't like"],["returns","The kind of story I keep coming back to"],["abandoned","The kind I thought I'd like but kept abandoning"]];
+var KEY="marginalia-journal-v1",db,v=0,cover=true,busy=false,panel=false,msg="",drag=null,z=1;
+try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!db||!db.items)db={items:[],grave:[],fav:{},dna:{},total:""};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db));return true}catch(e){msg="Storage is full. Copy a backup and remove some images.";return false}}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function by(id){return db.items.filter(function(x){return x.id===id})[0]}
+function per(){return innerWidth>=900?2:1}
+function N(){return 4+10*db.items.length}
+function dots(id,k,val,sym){var h='<span class="dots">';for(var i=1;i<=5;i++)h+='<button data-id="'+id+'" data-dot="'+k+'" data-v="'+i+'" aria-label="'+i+' of 5">'+(i<=val?sym:"○")+'</button>';return h+'</span>'}
+function sec(si,it){var s=SEC[si],h='<h3>'+s[0]+'</h3>';
+s[1].forEach(function(f,fi){var k=si+"."+fi,val=it.d[k];
+if(f[0]=="t")h+='<label>'+f[1]+'</label><textarea data-id="'+it.id+'" data-k="'+k+'">'+esc(val)+'</textarea>';
+if(f[0]=="d")h+='<div class="row"><span>'+f[1]+'</span>'+dots(it.id,k,+val||0,si==7?"★":"●")+'</div>';
+if(f[0]=="c")h+='<label>'+f[1]+'</label><div class="opts">'+f[2].map(function(o){return'<button data-id="'+it.id+'" data-k="'+k+'" data-o="'+esc(o)+'" class="'+(val===o?"on":"")+'">'+esc(o)+'</button>'}).join("")+'</div>'});
+return h}
+function body(i){
+if(i==0){var h='<h2>Contents</h2><p class="sub">'+db.items.length+' logged'+(db.total?' of '+esc(db.total):'')+'. Tap a title to open it.</p><label>Total in my library</label><input data-tot value="'+esc(db.total)+'" inputmode="numeric"><label>New title</label><input id="nt" placeholder="Title"><div class="row"><input id="ng" placeholder="Genre"><input id="ne" placeholder="Episodes" inputmode="numeric"></div><p><button data-act="add">Add to the book</button></p>';
+db.items.forEach(function(x,j){h+='<div class="item" data-open="'+(4+10*j)+'"><span>'+String(j+1).padStart(3,"0")+'  '+esc(x.title)+'</span><small>'+esc(x.status)+'</small></div>'});return h}
+if(i==1){var h='<h2>The favourites</h2><p class="sub">Unranked. Just categories.</p>';FAV.forEach(function(f,j){h+='<label>'+f+'</label><textarea data-fav="'+j+'">'+esc(db.fav[j])+'</textarea>'});return h}
+if(i==2){var h='<h2>The graveyard</h2><p class="sub">Abandoned series.</p><input id="gt" placeholder="Title"><div class="row"><input id="ga" placeholder="Stopped at ep." inputmode="numeric"><select id="gw">'+DNF.map(function(d){return'<option>'+d+'</option>'}).join("")+'</select></div><p><button data-act="addg">Bury it</button></p>';
+db.grave.forEach(function(g,j){h+='<div class="item"><span>'+esc(g.t)+'</span><small>ep. '+esc(g.a||"?")+', '+esc(g.w)+' <button data-delg="'+j+'" aria-label="Delete">×</button></small></div>'});return h}
+if(i==3){var h='<h2>My reading DNA</h2><p class="sub">What makes a story become mine?</p>';DNA.forEach(function(d){h+='<label>'+d[1]+'</label><textarea data-dna="'+d[0]+'">'+esc(db.dna[d[0]])+'</textarea>'});return h}
+var t=Math.floor((i-4)/10),k=(i-4)%10,it=db.items[t],id=it.id;
+if(k==0)return'<p class="sub">No. '+String(t+1).padStart(3,"0")+'</p><input data-id="'+id+'" data-f="title" value="'+esc(it.title)+'" style="font-size:34px;line-height:42px"><label>Genre</label><input data-id="'+id+'" data-f="genre" value="'+esc(it.genre)+'"><label>Episodes</label><input data-id="'+id+'" data-f="eps" value="'+esc(it.eps)+'" inputmode="numeric"><label>Status</label><select data-id="'+id+'" data-f="status">'+["Reading","Finished","Paused"].map(function(s){return'<option'+(it.status===s?" selected":"")+'>'+s+'</option>'}).join("")+'</select><p style="margin-top:30px"><button data-id="'+id+'" data-act="rm">Remove this title</button></p>';
+if(k<=5)return sec(k-1,it);
+if(k==6){var h='<h2>Marginalia</h2><p class="sub">Little thoughts while reading.</p>';(it.m||[]).forEach(function(m,j){h+='<div class="note hw">Ep. '+esc(m.ep)+': '+esc(m.n)+' <button data-id="'+id+'" data-delm="'+j+'" aria-label="Delete">×</button></div>'});
+return h+'<div class="row"><input id="mep" placeholder="Ep." style="width:70px" inputmode="numeric"><input id="mn" placeholder="Oh. OH."></div><p><button data-id="'+id+'" data-act="addm">Add note</button></p>'}
+if(k==7)return sec(5,it)+sec(6,it);
+if(k==8)return sec(7,it);
+return'<h2>Favourite scenes</h2><p class="sub">Drag to arrange.</p><button data-act="pick" data-id="'+id+'">Add images</button><div class="coll" data-id="'+id+'">'+(it.col||[]).map(function(c,j){return'<div class="ph" data-ci="'+j+'" style="left:'+c.x+'%;top:'+c.y+'%;transform:rotate('+c.r+'deg)"><img src="'+c.s+'" alt="Scene"><button data-id="'+id+'" data-delc="'+j+'" aria-label="Remove">×</button></div>'}).join("")+'</div>'}
+function pg(i){if(i<0||i>=N())return'<div class="page"></div>';return'<div class="page"><div class="in">'+body(i)+'</div><div class="fold">'+(i+1)+'</div></div>'}
+function render(){var a=document.activeElement&&document.activeElement.id,h;
+if(cover)h='<div id="stage"><button id="cover" class="leather" data-act="open"><h1>Marginalia</h1><p>a reading journal</p><p style="margin-top:40px">Tap to open</p></button></div>';
+else{var P=per(),s=P==2?'<div class="slot L">'+pg(v)+'</div><div class="slot R">'+pg(v+1)+'</div>':'<div class="slot R">'+pg(v)+'</div>';
+h='<div id="stage"><div id="frame" class="leather"><div id="book">'+s+'</div></div></div><div id="bar"><button data-nav="-1">‹ Back</button><button data-act="toc">Contents</button><span>'+(v+1)+(P==2?"–"+(v+2):"")+' / '+N()+'</span><button data-act="panel">Backup</button><button data-act="close">Close</button><button data-nav="1">Next ›</button></div>'}
+if(panel)h+='<div id="panel"><div><h2>Backup</h2><p class="tiny">Your journal lives in this browser only. Copy a backup now and then.</p><button data-act="exp">Copy backup</button><label>Paste a backup to restore</label><textarea id="imp" style="min-height:70px"></textarea><p><button data-act="imp">Restore</button> <button data-act="x">Done</button></p><p class="tiny">'+esc(msg)+'</p></div></div>';
+$("app").innerHTML=h;if(a&&$(a))$(a).focus()}
+function $(id){return document.getElementById(id)}
+function flip(d){if(busy||cover)return;var P=per(),nv=v+d*P;if(nv<0||nv>=N())return;busy=true;var book=$("book"),fw=d>0,h;
+var blank='<div class="page"></div>';
+if(P==2){h=fw?['<div class="slot L">'+pg(v)+'</div><div class="slot R">'+pg(nv+1)+'</div>',pg(v+1),pg(nv)]:['<div class="slot L">'+pg(nv)+'</div><div class="slot R">'+pg(v+1)+'</div>',pg(nv+1),pg(v)]}
+else h=fw?['<div class="slot R">'+pg(nv)+'</div>',pg(v),blank]:['<div class="slot R">'+pg(v)+'</div>',pg(nv),blank];
+book.innerHTML=h[0]+'<div id="leaf" style="'+(P==2?"left:50%;width:50%":"left:0;width:100%")+';transform:rotateY('+(fw?0:-180)+'deg)"><div class="f"><div class="slot R" style="width:100%">'+h[1]+'</div></div><div class="f b"><div class="slot L" style="width:100%">'+h[2]+'</div></div></div>';
+var lf=$("leaf");lf.offsetWidth;lf.style.transition="transform .75s cubic-bezier(.5,0,.3,1)";lf.style.transform="rotateY("+(fw?-180:0)+"deg)";
+setTimeout(function(){v=nv;busy=false;render()},780)}
+function go(i){if(busy)return;v=per()==2?i-(i%2):i;render()}
+document.addEventListener("click",function(e){var t=e.target.closest("button,.item"),d,it;if(!t)return;d=t.dataset;it=d.id&&by(d.id);
+if(d.nav)return flip(+d.nav);
+if(d.open)return go(+d.open);
+if(d.dot){it.d[d.dot]=(it.d[d.dot]==d.v)?0:+d.v;save();return render()}
+if(d.o){it.d[d.k]=it.d[d.k]===d.o?"":d.o;save();return render()}
+if(d.delm){it.m.splice(+d.delm,1);save();return render()}
+if(d.delc){it.col.splice(+d.delc,1);save();return render()}
+if(d.delg){db.grave.splice(+d.delg,1);save();return render()}
+var a=d.act;
+if(a=="open"){cover=false;v=0;return render()}
+if(a=="close"){cover=true;return render()}
+if(a=="toc")return go(0);
+if(a=="panel"||a=="x"){panel=a=="panel";msg="";return render()}
+if(a=="add"){var n=$("nt").value.trim();if(!n)return;db.items.push({id:"t"+Date.now(),title:n,genre:$("ng").value.trim(),eps:$("ne").value.trim(),status:"Reading",d:{},m:[],col:[]});save();return go(4+10*(db.items.length-1))}
+if(a=="addm"){var m=$("mn").value.trim();if(!m)return;it.m=it.m||[];it.m.push({ep:$("mep").value.trim(),n:m});save();return render()}
+if(a=="addg"){var g=$("gt").value.trim();if(!g)return;db.grave.push({t:g,a:$("ga").value.trim(),w:$("gw").value});save();return render()}
+if(a=="rm"){if(confirm("Remove this title and all its notes and images?")){db.items=db.items.filter(function(x){return x.id!==d.id});save();go(0)}return}
+if(a=="pick"){var f=document.createElement("input");f.type="file";f.accept="image/*";f.multiple=true;f.onchange=function(){addImgs(it,f.files)};f.click();return}
+if(a=="exp"){var s=JSON.stringify(db);(navigator.clipboard?navigator.clipboard.writeText(s):Promise.reject()).then(function(){msg="Copied.";render()},function(){$("imp").value=s;msg="Copy the text from the box."})}
+if(a=="imp"){try{var o=JSON.parse($("imp").value);if(!o.items)throw 0;db=o;save();msg="Restored.";render()}catch(x){msg="That text is not a valid backup.";render()}}});
+function addImgs(it,files){it.col=it.col||[];var left=files.length;Array.prototype.forEach.call(files,function(file){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*s;c.height=im.height*s;c.getContext("2d").drawImage(im,0,0,c.width,c.height);it.col.push({s:c.toDataURL("image/jpeg",.72),x:5+Math.random()*45,y:4+Math.random()*40,r:Math.round(Math.random()*12-6)});if(--left==0){save();render()}};im.src=r.result};r.readAsDataURL(file)})}
+document.addEventListener("input",function(e){var t=e.target,d=t.dataset,it=d.id&&by(d.id);
+if(d.k&&it)it.d[d.k]=t.value;else if(d.f&&it){it[d.f]=t.value}
+else if(d.fav)db.fav[d.fav]=t.value;else if(d.dna)db.dna[d.dna]=t.value;else if("tot" in d)db.total=t.value;else return;save()});
+document.addEventListener("change",function(e){if(e.target.dataset.f=="status")render()});
+document.addEventListener("pointerdown",function(e){var p=e.target.closest(".ph");if(!p||e.target.closest("button"))return;var st=p.parentNode;drag={p:p,st:st,x:e.clientX,y:e.clientY,l:parseFloat(p.style.left),t:parseFloat(p.style.top)};p.style.zIndex=++z;p.setPointerCapture(e.pointerId)});
+document.addEventListener("pointermove",function(e){if(!drag)return;var r=drag.st.getBoundingClientRect();drag.p.style.left=Math.max(-5,Math.min(70,drag.l+(e.clientX-drag.x)/r.width*100))+"%";drag.p.style.top=Math.max(-5,Math.min(75,drag.t+(e.clientY-drag.y)/r.height*100))+"%"});
+document.addEventListener("pointerup",function(){if(!drag)return;var it=by(drag.st.dataset.id),c=it&&it.col[+drag.p.dataset.ci];if(c){c.x=parseFloat(drag.p.style.left);c.y=parseFloat(drag.p.style.top);save()}drag=null});
+var sx,sy;document.addEventListener("touchstart",function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY;if(e.target.closest(".ph,textarea,input,select"))sx=null},{passive:true});
+document.addEventListener("touchend",function(e){if(sx==null||cover)return;var dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>70&&Math.abs(dy)<50)flip(dx<0?1:-1)},{passive:true});
+document.addEventListener("keydown",function(e){if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;if(e.key=="ArrowRight")flip(1);if(e.key=="ArrowLeft")flip(-1)});
+addEventListener("resize",function(){if(!busy){if(per()==2)v-=v%2;render()}});
+render();
+</script></body></html>
